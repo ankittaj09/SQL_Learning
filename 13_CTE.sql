@@ -89,4 +89,48 @@ select
         where Profit_Pct>500
         order by Profit_Pct;
         
- 
+ # More Readable Form of SQL
+ WITH avg_rating AS (
+    SELECT
+        AVG(imdb_rating) AS avg_imdb_rating
+    FROM movies
+),
+
+financial_profit AS (
+    SELECT
+        movie_id,
+        budget,
+        revenue,
+        ((revenue - budget) * 100.0 / budget) AS profit_pct
+    FROM financials
+),
+
+low_rated_movies AS (
+    SELECT
+        movie_id,
+        title,
+        imdb_rating
+    FROM movies
+    WHERE imdb_rating < (
+        SELECT avg_imdb_rating
+        FROM avg_rating
+    )
+)
+
+SELECT
+    fp.movie_id,
+    lm.title,
+    lm.imdb_rating,
+    fp.profit_pct
+FROM financial_profit fp
+INNER JOIN low_rated_movies lm
+	  ON fp.movie_id = lm.movie_id
+WHERE fp.profit_pct > 500
+ORDER BY fp.profit_pct DESC;
+
+# Benefits
+-- 1.Simple Queries
+-- 2.same resultset can be referenced multiple times
+-- 3. we can convert a subquery into a view if it is used multiple times 
+
+# Recursive Query
