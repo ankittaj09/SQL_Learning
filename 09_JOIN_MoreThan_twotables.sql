@@ -8,11 +8,13 @@ select
     group by m.movie_id;
     
 select 	
-	a.name,group_concat(m.title separator ",  ")
+	a.name,group_concat(m.title separator ",  ") as movies,
+    count(m.title) as movie_count
 	from movies m
     join movie_actor ma
     on m.movie_id=ma.movie_id
     join actors a
     on ma.actor_id=a.actor_id
     group by a.name
+    order by movie_count desc
     ;
